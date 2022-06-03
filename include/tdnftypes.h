@@ -176,6 +176,7 @@ typedef struct _TDNF_SOLVED_PKG_INFO
 {
     int nNeedAction;
     int nNeedDownload;
+    uint32_t dwTotalDownloadSizeBytes;
     TDNF_ALTERTYPE nAlterType;
     PTDNF_PKG_INFO pPkgsNotAvailable;
     PTDNF_PKG_INFO pPkgsExisting;

@@ -1624,6 +1624,9 @@ TDNFResolve(
         pSolvedPkgInfo->pPkgsToDowngrade ||
         pSolvedPkgInfo->pPkgsToReinstall;
 
+    dwError = TDNFCalculateTotalDownloadSize(pSolvedPkgInfo);
+    BAIL_ON_TDNF_ERROR(dwError);
+
     pSolvedPkgInfo->ppszPkgsNotResolved = ppszPkgsNotResolved;
     *ppSolvedPkgInfo = pSolvedPkgInfo;
 

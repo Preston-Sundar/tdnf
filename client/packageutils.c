@@ -940,6 +940,50 @@ error:
 }
 
 uint32_t
+TDNFCalculateTotalDownloadSize(
+    PTDNF_SOLVED_PKG_INFO pSolvedPkgInfo
+    )
+{
+    uint32_t dwError = 0;
+    uint32_t dwTotalDownloadSizeBytes = 0;
+    uint8_t byPkgIndex = 0;
+    PTDNF_PKG_INFO pPkgInfo = NULL;
+
+    if(!pSolvedPkgInfo)
+    {
+        dwError = ERROR_TDNF_INVALID_PARAMETER;
+        BAIL_ON_TDNF_ERROR(dwError);
+    }
+
+    if(!pSolvedPkgInfo->nNeedDownload)
+    {
+        pSolvedPkgInfo->dwTotalDownloadSizeBytes = 0;
+        BAIL_ON_TDNF_ERROR(dwError);
+    }
+
+    PTDNF_PKG_INFO ppPkgsNeedDownload[4] = {
+        pSolvedPkgInfo->pPkgsToInstall,
+        pSolvedPkgInfo->pPkgsToDowngrade,
+        pSolvedPkgInfo->pPkgsToUpgrade,
+        pSolvedPkgInfo->pPkgsToReinstall
+    };
+
+    for (byPkgIndex = 0; byPkgIndex < ARRAY_SIZE(ppPkgsNeedDownload); byPkgIndex++)
+    {
+        pPkgInfo = ppPkgsNeedDownload[byPkgIndex];
+        while(pPkgInfo) {
+            dwTotalDownloadSizeBytes += pPkgInfo->dwDownloadSizeBytes;
+            pPkgInfo = pPkgInfo->pNext;
+        }
+    }
+
+    pSolvedPkgInfo->dwTotalDownloadSizeBytes = dwTotalDownloadSizeBytes;
+
+error:
+    return dwError;
+}
+
+uint32_t
 TDNFPopulatePkgInfos(
     PSolvSack pSack,
     PSolvPackageList pPkgList,
