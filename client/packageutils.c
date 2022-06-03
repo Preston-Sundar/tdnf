@@ -161,6 +161,12 @@ TDNFPopulatePkgInfoArray(
                           &pPkgInfo->dwInstallSizeBytes);
             BAIL_ON_TDNF_ERROR(dwError);
 
+            dwError = SolvGetPkgDownloadSizeFromId(
+                        pSack,
+                        dwPkgId,
+                        &pPkgInfo->dwDownloadSizeBytes);
+            BAIL_ON_TDNF_ERROR(dwError);
+
             dwError = TDNFUtilsFormatSize(
                           pPkgInfo->dwInstallSizeBytes,
                           &pPkgInfo->pszFormattedSize);
@@ -1004,7 +1010,12 @@ TDNFPopulatePkgInfos(
                       pSack,
                       dwPkgId,
                       &pPkgInfo->dwInstallSizeBytes);
+        BAIL_ON_TDNF_ERROR(dwError);
 
+        dwError = SolvGetPkgDownloadSizeFromId(
+                      pSack,
+                      dwPkgId,
+                      &pPkgInfo->dwDownloadSizeBytes);
         BAIL_ON_TDNF_ERROR(dwError);
 
         dwError = TDNFUtilsFormatSize(

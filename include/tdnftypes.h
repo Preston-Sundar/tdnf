@@ -152,6 +152,7 @@ typedef struct _TDNF_PKG_INFO
 {
     uint32_t dwEpoch;
     uint32_t dwInstallSizeBytes;
+    uint32_t dwDownloadSizeBytes;
     char* pszName;
     char* pszRepoName;
     char* pszVersion;
