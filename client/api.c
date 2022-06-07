@@ -1627,6 +1627,9 @@ TDNFResolve(
     dwError = TDNFCalculateTotalDownloadSize(pSolvedPkgInfo);
     BAIL_ON_TDNF_ERROR(dwError);
 
+    dwError = TDNFCheckAvailableCache(pTdnf->pConf, pSolvedPkgInfo);
+    BAIL_ON_TDNF_ERROR(dwError);
+
     pSolvedPkgInfo->ppszPkgsNotResolved = ppszPkgsNotResolved;
     *ppSolvedPkgInfo = pSolvedPkgInfo;
 

@@ -945,6 +945,45 @@ error:
 }
 
 uint32_t
+TDNFCheckAvailableCache(
+    PTDNF_CONF pConf,
+    PTDNF_SOLVED_PKG_INFO pSolvedPkgInfo
+    )
+{
+    uint32_t dwError = 0;
+    uint64_t qwAvailCacheBytes = 0;
+
+    if(!pSolvedPkgInfo)
+    {
+        dwError = ERROR_TDNF_INVALID_PARAMETER;
+        BAIL_ON_TDNF_ERROR(dwError);
+    }
+
+    if(!pConf || !pConf->pszCacheDir)
+    {
+        dwError = ERROR_TDNF_INVALID_PARAMETER;
+        BAIL_ON_TDNF_ERROR(dwError);
+    }
+
+    struct statfs tmpStatfsBuffer;
+    if (statfs(pConf->pszCacheDir, &tmpStatfsBuffer) != 0)
+    {
+        dwError = errno;
+        BAIL_ON_TDNF_SYSTEM_ERROR(dwError);
+    }
+
+    qwAvailCacheBytes = tmpStatfsBuffer.f_bsize * tmpStatfsBuffer.f_bavail;
+    if (qwAvailCacheBytes < pSolvedPkgInfo->dwTotalDownloadSizeBytes)
+    {
+        dwError = ERROR_TDNF_CACHE_OUT_OF_MEMORY;
+        BAIL_ON_TDNF_ERROR(dwError);
+    }
+
+error:
+    return dwError;
+}
+
+uint32_t
 TDNFCalculateTotalDownloadSize(
     PTDNF_SOLVED_PKG_INFO pSolvedPkgInfo
     )

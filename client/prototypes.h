@@ -427,6 +427,12 @@ TDNFCheckProtectedPkgs(
     );
 
 uint32_t
+TDNFCheckAvailableCache(
+    PTDNF_CONF pConf,
+    PTDNF_SOLVED_PKG_INFO pSolvedPkgInfo
+    );
+
+uint32_t
 TDNFCalculateTotalDownloadSize(
     PTDNF_SOLVED_PKG_INFO pSolvedPkgInfo
     );
