@@ -113,7 +113,7 @@ def test_enable_repo_make_cache_verbose(utils):
     assert(before < after)
 
 
-def test_download_vs_cache_cache_size_single_package(utils):
+def test_download_vs_cache_size_single_package(utils):
     clean_cache(utils)
     enable_cache(utils)
 
@@ -128,7 +128,7 @@ def test_download_vs_cache_cache_size_single_package(utils):
     assert(utils.floats_approx_equal(down_bytes, cached_rpm_bytes))
 
 
-def test_download_vs_cache_cache_size_multiple_packages(utils):
+def test_download_vs_cache_size_multiple_packages(utils):
     clean_cache(utils)
     enable_cache(utils)
 
