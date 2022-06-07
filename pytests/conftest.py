@@ -299,13 +299,11 @@ ui_repoid_vars=basearch
             if key in line:
                 return line.split()[-1]
 
-
     def download_size_to_bytes(self, stdout):
         size_chars = 'bkMG'
-        raw_str = self._get_stdout_total_download_size(stdout,)
+        raw_str = self._get_stdout_total_download_size(stdout)
         size, unit = float(raw_str[:-1]), raw_str[-1]
         return size * (1024 ** size_chars.index(unit))
-
 
     def get_cached_package_sizes(self, cache_dir):
         ret = self.run(['find', cache_dir, '-name', '*.rpm'])
@@ -314,9 +312,7 @@ ui_repoid_vars=basearch
             pkg_size_map[rpm] = os.path.getsize(rpm)
         return pkg_size_map
 
-    
     def floats_approx_equal(self, x, y, tol=500):
-        print("DELTA", abs(x - y))
         return abs(x - y) <= tol
 
 
