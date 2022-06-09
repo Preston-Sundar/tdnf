@@ -234,7 +234,7 @@ typedef enum
     {ERROR_TDNF_PERM, "ERROR_TDNF_PERM", "Operation not permitted. You have to be root."},\
     {ERROR_TDNF_INVALID_PARAMETER, "ERROR_TDNF_INVALID_PARAMETER", "Invalid argument."},\
     {ERROR_TDNF_OUT_OF_MEMORY, "ERROR_TDNF_OUT_OF_MEMORY", "Out of memory."},\
-    {ERROR_TDNF_NO_DATA, "ERROR_TDNF_NO_DATA", "No data available."},\
+    {ERROR_TDNF_NO_DATA, "ERROR_TDNF_NO_DATA", "No data available"},\
     {ERROR_TDNF_FILE_NOT_FOUND, "ERROR_TDNF_FILE_NOT_FOUND", "File not found."},\
     {ERROR_TDNF_ACCESS_DENIED, "ERROR_TDNF_ACCESS_DENIED", "Permission denied."},\
     {ERROR_TDNF_ALREADY_EXISTS, "ERROR_TDNF_ALREADY_EXISTS", "File exists."},\
