@@ -975,7 +975,7 @@ TDNFCheckAvailableCache(
     qwAvailCacheBytes = tmpStatfsBuffer.f_bsize * tmpStatfsBuffer.f_bavail;
     if (qwAvailCacheBytes < pSolvedPkgInfo->dwTotalDownloadSizeBytes)
     {
-        dwError = ERROR_TDNF_CACHE_OUT_OF_MEMORY;
+        dwError = ERROR_TDNF_CACHE_DIR_OUT_OF_DISK_SPACE;
         BAIL_ON_TDNF_ERROR(dwError);
     }
 
