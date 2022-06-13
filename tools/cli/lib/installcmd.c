@@ -693,14 +693,8 @@ PrintAction(
     pr_info("Total download size: %s\n", pszTotalDownloadSize);
 
 cleanup:
-    if (pszTotalInstallSize)
-    {
-        free(pszTotalInstallSize);
-    }
-    if (pszTotalDownloadSize)
-    {
-        free(pszTotalDownloadSize);
-    }
+    TDNFFreeMemory(pszTotalInstallSize);
+    TDNFFreeMemory(pszTotalDownloadSize);
     return dwError;
 
 error:

@@ -945,51 +945,47 @@ error:
 }
 
 uint32_t
-TDNFCheckAvailableCache(
+TDNFGetAvailableCacheBytes(
     PTDNF_CONF pConf,
-    PTDNF_SOLVED_PKG_INFO pSolvedPkgInfo
+    uint64_t* pqwAvailCacheDirBytes
     )
 {
     uint32_t dwError = 0;
-    uint64_t qwAvailCacheBytes = 0;
+    struct statfs tmpStatfsBuffer = {0};
 
-    if(!pSolvedPkgInfo)
+    if(!pConf || !pConf->pszCacheDir || !pqwAvailCacheDirBytes)
     {
         dwError = ERROR_TDNF_INVALID_PARAMETER;
         BAIL_ON_TDNF_ERROR(dwError);
     }
 
-    if(!pConf || !pConf->pszCacheDir)
-    {
-        dwError = ERROR_TDNF_INVALID_PARAMETER;
-        BAIL_ON_TDNF_ERROR(dwError);
-    }
-
-    struct statfs tmpStatfsBuffer;
     if (statfs(pConf->pszCacheDir, &tmpStatfsBuffer) != 0)
     {
         dwError = errno;
         BAIL_ON_TDNF_SYSTEM_ERROR(dwError);
     }
 
-    qwAvailCacheBytes = tmpStatfsBuffer.f_bsize * tmpStatfsBuffer.f_bavail;
-    if (qwAvailCacheBytes < pSolvedPkgInfo->dwTotalDownloadSizeBytes)
-    {
-        dwError = ERROR_TDNF_CACHE_DIR_OUT_OF_DISK_SPACE;
-        BAIL_ON_TDNF_ERROR(dwError);
-    }
+    *pqwAvailCacheDirBytes = tmpStatfsBuffer.f_bsize * tmpStatfsBuffer.f_bavail;
+
+cleanup:
+    return dwError;
 
 error:
-    return dwError;
+    if(pqwAvailCacheDirBytes)
+    {
+        *pqwAvailCacheDirBytes = 0;
+    }
+    goto cleanup;
 }
 
 uint32_t
-TDNFCalculateTotalDownloadSize(
-    PTDNF_SOLVED_PKG_INFO pSolvedPkgInfo
+TDNFCheckDownloadCacheBytes(
+    PTDNF_SOLVED_PKG_INFO pSolvedPkgInfo,
+    uint64_t qwAvailCacheBytes
     )
 {
     uint32_t dwError = 0;
-    uint32_t dwTotalDownloadSizeBytes = 0;
+    uint64_t qwTotalDownloadSizeBytes = 0;
     uint8_t byPkgIndex = 0;
     PTDNF_PKG_INFO pPkgInfo = NULL;
 
@@ -1001,7 +997,6 @@ TDNFCalculateTotalDownloadSize(
 
     if(!pSolvedPkgInfo->nNeedDownload)
     {
-        pSolvedPkgInfo->dwTotalDownloadSizeBytes = 0;
         BAIL_ON_TDNF_ERROR(dwError);
     }
 
@@ -1016,12 +1011,15 @@ TDNFCalculateTotalDownloadSize(
     {
         pPkgInfo = ppPkgsNeedDownload[byPkgIndex];
         while(pPkgInfo) {
-            dwTotalDownloadSizeBytes += pPkgInfo->dwDownloadSizeBytes;
+            qwTotalDownloadSizeBytes += pPkgInfo->dwDownloadSizeBytes;
+            if (qwTotalDownloadSizeBytes > qwAvailCacheBytes)
+            {
+                dwError = ERROR_TDNF_CACHE_DIR_OUT_OF_DISK_SPACE;
+                BAIL_ON_TDNF_ERROR(dwError);
+            }
             pPkgInfo = pPkgInfo->pNext;
         }
     }
-
-    pSolvedPkgInfo->dwTotalDownloadSizeBytes = dwTotalDownloadSizeBytes;
 
 error:
     return dwError;
