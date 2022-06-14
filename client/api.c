@@ -1557,7 +1557,7 @@ TDNFResolve(
     Queue queueGoal = {0};
     char** ppszPkgsNotResolved = NULL;
     PTDNF_SOLVED_PKG_INFO pSolvedPkgInfo = NULL;
-    uint64_t qwAvailCacheBytes;
+    uint64_t qwAvailCacheBytes = 0;
 
     if(!pTdnf || !ppSolvedPkgInfo)
     {
