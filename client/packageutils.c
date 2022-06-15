@@ -995,11 +995,6 @@ TDNFCheckDownloadCacheBytes(
         BAIL_ON_TDNF_ERROR(dwError);
     }
 
-    if(!pSolvedPkgInfo->nNeedDownload)
-    {
-        BAIL_ON_TDNF_ERROR(dwError);
-    }
-
     PTDNF_PKG_INFO ppPkgsNeedDownload[4] = {
         pSolvedPkgInfo->pPkgsToInstall,
         pSolvedPkgInfo->pPkgsToDowngrade,
