@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -e
+
+## file:    build-tdnf-rpms.sh
+## brief:   Build tdnf rpms using tdnf.spec
+## author:  Shreenidhi Shedi <sshedi@vmware.com>
+
+if [ ${EUID} -ne 0 ]; then
+  echo "Script must be run as root." 1>&2
+  exit 1
+fi
+
+arch="$(uname -m)"
+project_name="tdnf"
+project_dir="/build"
+
+cd "${project_dir}"
+project_version="3.4.0"
+rpm_build_path="${project_dir}/rpmbuild"
+full_name="${project_name}-${project_version}"
+
+build_tools=(git tar gzip file)
+if ! rpm -q ${build_tools[@]} > /dev/null; then
+  echo "Installing required build tools..."
+  if grep -w ID /etc/os-release | grep -i photon > /dev/null; then
+    tdnf install -y ${build_tools[@]}
+  elif grep -w ID /etc/os-release | grep -i fedora > /dev/null; then
+    dnf install -y ${build_tools[@]}
+  fi
+fi
+
+# https://github.com/actions/checkout/issues/760
+git config --global --add safe.directory $(pwd)
+
+echo "Building ${full_name} RPMs"
+tar zcf ${full_name}.tar.gz --transform "s,^,${full_name}/," $(git ls-files)
+
+rm -rf "${rpm_build_path}"
+mkdir -p "${rpm_build_path}"/{SOURCES,BUILD,RPMS/"${arch}"}
+
+mv -f "${full_name}".tar.gz "${rpm_build_path}"/SOURCES
+
+dist=$(rpm -q glibc | cut -d'.' -f3)
+rpmbuild --nodeps -D "dist .${dist}" -D "_topdir ${rpm_build_path}" -bb "${project_name}".spec
+
+rpmdir="rpms"
+mkdir -p ${rpmdir}
+mv -f "${rpm_build_path}"/RPMS/"${arch}"/*.rpm ${rpmdir}
+echo -e "\n\n--- tdnf rpms are available at $(realpath ${rpmdir}) ---\n\n"

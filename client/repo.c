@@ -446,6 +446,79 @@ error:
 }
 
 uint32_t
+TDNFEventRepoMDDownloadStart(
+    PTDNF pTdnf,
+    const char *pszRepoDataDir
+    )
+{
+    uint32_t dwError = 0;
+    TDNF_EVENT_CONTEXT stContext = {0};
+
+    if (!pTdnf)
+    {
+        dwError = ERROR_TDNF_INVALID_PARAMETER;
+        BAIL_ON_TDNF_ERROR(dwError);
+    }
+
+    stContext.nEvent = MAKE_PLUGIN_EVENT(
+                           TDNF_PLUGIN_EVENT_TYPE_REPO_MD,
+                           TDNF_PLUGIN_EVENT_STATE_DOWNLOAD,
+                           TDNF_PLUGIN_EVENT_PHASE_START);
+
+    dwError = TDNFAddEventDataString(
+        &stContext,
+        TDNF_EVENT_ITEM_REPO_DATADIR,
+        pszRepoDataDir);
+    BAIL_ON_TDNF_ERROR(dwError);
+
+
+    dwError = TDNFPluginRaiseEvent(pTdnf, &stContext);
+    BAIL_ON_TDNF_ERROR(dwError);
+
+cleanup:
+    TDNFFreeEventData(stContext.pData);
+    return dwError;
+error:
+    goto cleanup;
+}
+
+// uint32_t
+// TDNFEventRepoMDCheckNeedDownload(
+//     PTDNF pTdnf,
+//     const char *pszRepoDataDir
+//     )
+// {
+//     uint32_t dwError = 0;
+//     TDNF_EVENT_CONTEXT stContext = {0};
+
+//     if (!pTdnf)
+//     {
+//         dwError = ERROR_TDNF_INVALID_PARAMETER;
+//         BAIL_ON_TDNF_ERROR(dwError);
+//     }
+
+//     stContext.nEvent = MAKE_PLUGIN_EVENT(
+//                            TDNF_PLUGIN_EVENT_TYPE_REPO_MD,
+//                            TDNF_PLUGIN_EVENT_STATE_ACCESS,
+//                            TDNF_PLUGIN_EVENT_PHASE_START);
+
+//     dwError = TDNFAddEventData(
+//         &stContext,
+//         TDNF_EVENT_ITEM_REPO_DATADIR,
+//         pszRepoDataDir);
+//     BAIL_ON_TDNF_ERROR(dwError);
+
+//     dwError = TDNFPluginRaiseEvent(pTdnf, &stContext);
+//     BAIL_ON_TDNF_ERROR(dwError);
+
+// cleanup:
+//     TDNFFreeEventData(stContext.pData);
+//     return dwError;
+// error:
+//     goto cleanup;
+// }
+
+uint32_t
 TDNFEventRepoMDDownloadEnd(
     PTDNF pTdnf,
     const char *pcszRepoId,
@@ -672,6 +745,12 @@ TDNFGetRepoMD(
         BAIL_ON_TDNF_ERROR(dwError);
     }
 
+    /* plugin event indicating a repomd download has started. */
+    dwError = TDNFEventRepoMDDownloadStart(
+        pTdnf,
+        pszRepoDataDir);
+    BAIL_ON_TDNF_ERROR(dwError);
+
     if (pRepoData->pszMetaLink)
     {
         metalink = 1;
@@ -685,11 +764,13 @@ TDNFGetRepoMD(
                            NULL);
     BAIL_ON_TDNF_ERROR(dwError);
 
+    /******METALINK****** -- DONE */
     dwError = TDNFJoinPath(&pszMetaLinkFile,
                            pszRepoDataDir,
                            TDNF_REPO_METALINK_FILE_NAME,
                            NULL);
     BAIL_ON_TDNF_ERROR(dwError);
+    /******METALINK****** -- DONE */
 
     dwError = TDNFAllocateMemory(
                   1,
@@ -713,6 +794,8 @@ TDNFGetRepoMD(
                            TDNF_REPO_BASEURL_FILE_NAME,
                            NULL);
     BAIL_ON_TDNF_ERROR(dwError);
+    
+    /******METALINK****** -- DONE */
     if (metalink)
     {
         /* if metalink OR baseurl file is not present, set flag to download */
@@ -726,6 +809,7 @@ TDNFGetRepoMD(
             nNeedDownload = 1;
         }
     }
+    /******METALINK****** -- DONE */
     else
     {
         /* if repomd.xml file is not present, set flag to download */

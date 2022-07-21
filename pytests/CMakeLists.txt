@@ -14,7 +14,14 @@ configure_file(
 )
 
 add_custom_target(check
-    COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH="${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" pytest
+    COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH="${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" pytest -k test_metalinker -s
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Running tests.."
 )
+
+add_custom_target(headless_server
+    COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH="${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" python3 pytests/conftest.py &
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../
+    COMMENT "Running tests.."
+)
+

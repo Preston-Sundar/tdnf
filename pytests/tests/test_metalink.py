@@ -21,18 +21,19 @@ def setup_test(utils):
 
 # while exiting, uncomment baseurl and comment metalink
 def teardown_test(utils):
-    set_baseurl(utils, True)
-    set_metalink(utils, False)
-    set_md5(utils, False)
-    set_sha1(utils, False)
-    set_sha256(utils, False)
-    set_sha512(utils, False)
+    # set_baseurl(utils, True)
+    # set_metalink(utils, False)
+    # set_md5(utils, False)
+    # set_sha1(utils, False)
+    # set_sha256(utils, False)
+    # set_sha512(utils, False)
     pkgname = utils.config["mulversion_pkgname"]
     utils.run(['tdnf', 'erase', '-y', pkgname])
 
 
 def set_baseurl(utils, enabled):
     tdnf_repo = os.path.join(utils.tdnf_config.get('main', 'repodir'), 'photon-test.repo')
+    print(tdnf_repo)
     if enabled:
         utils.run(['sed', '-i', '/baseurl/s/^#//g', tdnf_repo])
     else:
@@ -140,7 +141,7 @@ def test_with_metalink_and_url(utils):
     pkgname = utils.config["mulversion_pkgname"]
     utils.erase_package(pkgname)
 
-    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', pkgname])
+    utils.run(['tdnf', 'install', '-y' , pkgname])
     assert(utils.check_package(pkgname))
 
 
@@ -156,7 +157,7 @@ def test_metalink_without_baseurl(utils):
     assert(ret['retval'] == 0)
     pkgname = utils.config["mulversion_pkgname"]
     utils.erase_package(pkgname)
-
+    pytest.exit("Graceful exit!")
     utils.run(['tdnf', 'install', '-y', '--nogpgcheck', pkgname])
     assert(utils.check_package(pkgname))
 

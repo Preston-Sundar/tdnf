@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #
 # Copyright (C) 2020 VMware, Inc. All Rights Reserved.
 #
@@ -6,5 +8,8 @@
 # of the License are located in the COPYING file of this distribution.
 #
 
-add_subdirectory("metalinker")
-add_subdirectory("repogpgcheck")
+exec > /var/cache/tdnf/cached-updateinfo.txt
+
+tdnf -q --refresh updateinfo | grep -vE '^Refreshing|^Disabling'
+
+exit ${PIPESTATUS[0]}

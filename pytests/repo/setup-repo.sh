@@ -113,6 +113,9 @@ EOF
 
 cat << EOF > ${TEST_REPO_DIR}/tdnf.conf
 [main]
+pluginpath=/build/build/plugins/lib
+pluginconfpath=/build/build/pytests/repo/pluginconf.d
+plugins=1
 gpgcheck=0
 installonly_limit=3
 clean_requirements_on_remove=true

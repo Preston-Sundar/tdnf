@@ -1,0 +1,3 @@
+set directories ../client/ ../include/ ../plugins/ ../tools/cli/ ../lib
+set args -c pytests/repo/tdnf.conf install -y --nogpgcheck tdnf-test-multiversion
+tui enable

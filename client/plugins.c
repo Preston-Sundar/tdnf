@@ -60,6 +60,7 @@ TDNFLoadPlugins(
         BAIL_ON_TDNF_ERROR(dwError);
     }
 
+    pr_info("_TDNFLoadPlugins()\n");
     dwError = _TDNFLoadPlugins(pTdnf->pArgs, &pPlugins);
     BAIL_ON_TDNF_ERROR(dwError);
 

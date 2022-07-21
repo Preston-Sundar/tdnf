@@ -299,9 +299,7 @@ ui_repoid_vars=basearch
             f.write(templ.format(name=name, baseurl=baseurl))
 
 
-@pytest.fixture(scope='session')
-def utils():
-    test_utils = TestUtils()
+def start_test_server(test_utils):
     server = Process(target=TestRepoServer,
                      args=(test_utils.config['repo_path'], ))
     server.start()
@@ -323,4 +321,17 @@ def utils():
         print('Server failed to start, aborting ...')
         sys.exit(1)
 
+
+@pytest.fixture(scope='session')
+def utils():
+    test_utils = TestUtils()
+    start_test_server(test_utils)
     return test_utils
+
+
+if __name__ == '__main__':
+    print("[+] Starting headless photon-test repo server.")
+    test_utils = TestUtils()
+    start_test_server(test_utils)
+    while(1):
+        time.sleep(1)

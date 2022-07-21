@@ -9,8 +9,8 @@
 #
 
 Summary:        dnf/yum equivalent using C libs
-Name:           @PROJECT_NAME@
-Version:        @PROJECT_VERSION@
+Name:           tdnf
+Version:        3.4.0
 Release:        1%{?dist}
 Vendor:         VMware, Inc.
 Distribution:   Photon
