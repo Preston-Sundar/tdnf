@@ -81,7 +81,7 @@ typedef struct _TDNF_EVENT_DATA_
     struct _TDNF_EVENT_DATA_ *pNext;
 } TDNF_EVENT_DATA, *PTDNF_EVENT_DATA;
 
-//Metalink Structures.
+//Metalink Structures. -- DONE
 typedef struct _TDNF_ML_LIST_
 {
     struct _TDNF_ML_LIST_ *next;

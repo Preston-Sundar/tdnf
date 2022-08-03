@@ -324,7 +324,7 @@ error:
     goto cleanup;
 }
 
-
+// Moved
 uint32_t
 TDNFCheckRepoMDFileHashFromMetalink(
     char *pszFile,
@@ -482,6 +482,7 @@ error:
     goto cleanup;
 }
 
+// METALINK PLUGIN -- MOVED
 uint32_t
 TDNFParseAndGetURLFromMetalink(
     PTDNF pTdnf,

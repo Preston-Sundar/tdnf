@@ -23,6 +23,7 @@ configure_file(
 
 add_library(${PROJECT_NAME} SHARED
     api.c
+    list.c
     metalinker.c
 )
 

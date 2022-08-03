@@ -38,7 +38,7 @@ TDNFPluginLoadInterface(
         BAIL_ON_TDNF_ERROR(dwError);
     }
 
-    printf("[METALINKER]: %s.\n", __FUNCTION__);
+    //printf("[METALINKER]: %s.\n", __FUNCTION__);
     pInterface->pFnInitialize = TDNFMetalinkerCheckInitialize;
     pInterface->pFnEventsNeeded = TDNFMetalinkerCheckEventsNeeded;
     pInterface->pFnGetErrorString = TDNFMetalinkerCheckGetErrorString;
@@ -202,24 +202,31 @@ TDNFMetalinkerCheckEvent(
                       (const void **)&pHandle->pTdnf);
         BAIL_ON_TDNF_ERROR(dwError);
     }
-    /* repo events to read config and cache entries with repo_gpgcheck=1 */
     else if (nEventType == TDNF_PLUGIN_EVENT_TYPE_REPO)
     {
-        pr_info("[METALINKER]: EVENT_REPO\n");
-        // if (nEventState == TDNF_PLUGIN_EVENT_STATE_READCONFIG &&
-        //     nEventPhase == TDNF_PLUGIN_EVENT_PHASE_END)
-        // {
-        //     dwError = TDNFRepoGPGCheckReadConfig(pHandle, pContext);
-        //     BAIL_ON_TDNF_ERROR(dwError);
-        // }
+        pr_info("[METALINKER]: EVENT_REPO __UNHANDLED__\n");
     }
     else if (nEventType == TDNF_PLUGIN_EVENT_TYPE_REPO_MD)
     {
-        pr_info("[METALINKER]: EVENT_REPO_MD\n");
         if (nEventState == TDNF_PLUGIN_EVENT_STATE_DOWNLOAD &&
+            nEventPhase == TDNF_PLUGIN_EVENT_PHASE_INIT)
+        {
+            pr_info("[METALINKER]: EVENT_REPO_MD, DOWNLOAD, START\n");
+            dwError = TDNFMetalinkerCheckFile(pHandle, pContext);
+            BAIL_ON_TDNF_ERROR(dwError);
+        }
+        else if (nEventState == TDNF_PLUGIN_EVENT_STATE_DOWNLOAD &&
             nEventPhase == TDNF_PLUGIN_EVENT_PHASE_START)
         {
-            dwError = TDNFMetalinkerCheckFile(pHandle, pContext);
+            pr_info("[METALINKER]: EVENT_REPO_MD, DOWNLOAD, START\n");
+            dwError = TDNFMetalinkerMDDownload(pHandle, pContext);
+            BAIL_ON_TDNF_ERROR(dwError);
+        }
+        else if (nEventState == TDNF_PLUGIN_EVENT_STATE_REFRESH &&
+            nEventPhase == TDNF_PLUGIN_EVENT_PHASE_START)
+        {
+            pr_info("[METALINKER]: EVENT_REPO_MD, REFRESH, START\n");
+            dwError = TDNFMetalinkerRefreshSolvCookie(pHandle, pContext);
             BAIL_ON_TDNF_ERROR(dwError);
         }
     }
