@@ -204,28 +204,28 @@ TDNFMetalinkerCheckEvent(
     }
     else if (nEventType == TDNF_PLUGIN_EVENT_TYPE_REPO)
     {
-        pr_info("[METALINKER]: EVENT_REPO __UNHANDLED__\n");
+        ;
     }
     else if (nEventType == TDNF_PLUGIN_EVENT_TYPE_REPO_MD)
     {
         if (nEventState == TDNF_PLUGIN_EVENT_STATE_DOWNLOAD &&
             nEventPhase == TDNF_PLUGIN_EVENT_PHASE_INIT)
         {
-            pr_info("[METALINKER]: EVENT_REPO_MD, DOWNLOAD, START\n");
+            printf("[METALINKER]: EVENT_REPO_MD, DOWNLOAD, INIT\n");
             dwError = TDNFMetalinkerCheckFile(pHandle, pContext);
             BAIL_ON_TDNF_ERROR(dwError);
         }
         else if (nEventState == TDNF_PLUGIN_EVENT_STATE_DOWNLOAD &&
             nEventPhase == TDNF_PLUGIN_EVENT_PHASE_START)
         {
-            pr_info("[METALINKER]: EVENT_REPO_MD, DOWNLOAD, START\n");
+            printf("[METALINKER]: EVENT_REPO_MD, DOWNLOAD, START\n");
             dwError = TDNFMetalinkerMDDownload(pHandle, pContext);
             BAIL_ON_TDNF_ERROR(dwError);
         }
         else if (nEventState == TDNF_PLUGIN_EVENT_STATE_REFRESH &&
             nEventPhase == TDNF_PLUGIN_EVENT_PHASE_START)
         {
-            pr_info("[METALINKER]: EVENT_REPO_MD, REFRESH, START\n");
+            printf("[METALINKER]: EVENT_REPO_MD, REFRESH, START\n");
             dwError = TDNFMetalinkerRefreshSolvCookie(pHandle, pContext);
             BAIL_ON_TDNF_ERROR(dwError);
         }

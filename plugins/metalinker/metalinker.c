@@ -6,7 +6,37 @@
  * of the License are located in the COPYING file of this distribution.
  */
 
+
 #include "includes.h"
+
+typedef struct _hash_op {
+    char *hash_type;
+    unsigned int length;
+} hash_op;
+
+static hash_op hash_ops[TDNF_HASH_SENTINEL] =
+    {
+       [TDNF_HASH_MD5]    = {"md5", MD5_DIGEST_LENGTH},
+       [TDNF_HASH_SHA1]   = {"sha1", SHA_DIGEST_LENGTH},
+       [TDNF_HASH_SHA256] = {"sha256", SHA256_DIGEST_LENGTH},
+       [TDNF_HASH_SHA512] = {"sha512", SHA512_DIGEST_LENGTH},
+    };
+
+typedef struct _hash_type {
+    char *hash_name;
+    unsigned int hash_value;
+}hash_type;
+
+static hash_type hashType[] =
+    {
+        {"md5", TDNF_HASH_MD5},
+        {"sha1", TDNF_HASH_SHA1},
+        {"sha-1", TDNF_HASH_SHA1},
+        {"sha256", TDNF_HASH_SHA256},
+        {"sha-256", TDNF_HASH_SHA256},
+        {"sha512", TDNF_HASH_SHA512},
+        {"sha-512", TDNF_HASH_SHA512}
+    };
 
 uint32_t
 TDNFMetalinkerXMLCheckVersion(
@@ -78,8 +108,9 @@ TDNFMetalinkerCheckFile(
     PTDNF_EVENT_CONTEXT pContext
     )
 {
-    char* pszTempPtr = NULL;
     uint32_t dwError = 0;
+    char* pszRepoDataDir = NULL;
+    char* pszMetaLink = NULL;
 
     // DEBUG
     // pr_info("\t %s() \n", __FUNCTION__);
@@ -113,10 +144,10 @@ TDNFMetalinkerCheckFile(
     dwError = TDNFEventContextGetItemString(
                     pContext,
                     TDNF_EVENT_ITEM_REPO_PLUGIN_URL,
-                    (const char **)&pszTempPtr);
+                    (const char **)&pszMetaLink);
     BAIL_ON_TDNF_ERROR(dwError);
     // TODO: dealloc in plugin exit or error. 
-    dwError = TDNFAllocateString(pszTempPtr,
+    dwError = TDNFAllocateString(pszMetaLink,
                                  &(pHandle->pszRepoMetalinkURL));
     BAIL_ON_TDNF_ERROR(dwError);
 
@@ -209,33 +240,70 @@ TDNFMetalinkerMDDownload(
     PTDNF_EVENT_CONTEXT pContext)
 {
     uint32_t dwError = 0;
+    PTDNF_REPO_DATA pRepoData = NULL;
+    char *pszRepoId = NULL;
+    char *pszRepoMDUrl = NULL;
+    char *pszRepoMDFile = NULL;
+    char *pszTmpRepoMDFile = NULL;
+    char *pszTmpBaseUrlFile = NULL;
     char *pszTmpRepoDataDir = NULL;
     char *pszTmpRepoMetalinkFile = NULL;
     unsigned char pszTmpCookie[SOLV_COOKIE_LEN] = {0};
-    char *pszId = NULL;
+    // char *pszId = NULL;
     int nNewRepoMDFile = 0;
     int nReplaceRepoMD = 0;
     int nReplacebaseURL = 0;
     TDNF_ML_CTX *ml_ctx = NULL;
 
+    //TODO: Get needed vars from plugin handle. pRepoData
+    dwError = TDNFEventContextGetItemPtr(
+                  pContext,
+                  TDNF_EVENT_ITEM_REPO_DATA,
+                  (const void **)&pRepoData);
+    BAIL_ON_TDNF_ERROR(dwError);
     //TODO: Get needed vars from plugin handle. pszTmpRepoDataDir
-    //TODO: Get needed vars from plugin handle. pszId
+    dwError = TDNFEventContextGetItemString(
+                  pContext,
+                  TDNF_EVENT_ITEM_REPO_MD_TMP_DATA_DIR,
+                  (const char **)&pszTmpRepoDataDir);
+    BAIL_ON_TDNF_ERROR(dwError);
+    //TODO: Get needed vars from plugin handle. pszRepoId
+    dwError = TDNFEventContextGetItemString(
+                  pContext,
+                  TDNF_EVENT_ITEM_REPO_ID,
+                  (const char **)&pszRepoId);
+    BAIL_ON_TDNF_ERROR(dwError);
     //TODO: Get needed vars from plugin handle. pszTmpRepoMDFile
-    //TODO: Get needed vars from plugin handle. pszRepoMDUrl
-
+    dwError = TDNFEventContextGetItemString(
+                  pContext,
+                  TDNF_EVENT_ITEM_REPO_MD_TMP_FILE,
+                  (const char **)&pszTmpRepoMDFile);
+    BAIL_ON_TDNF_ERROR(dwError);
+    // //TODO: Get needed vars from plugin handle. pszRepoMDUrl
+    // dwError = TDNFEventContextGetItemString(
+    //               pContext,
+    //               TDNF_EVENT_ITEM_REPO_MD_URL,
+    //               (const char **)&pszRepoMDUrl);
+    // BAIL_ON_TDNF_ERROR(dwError);
+    //TODO: Get needed vars from plugin handle. pszRepoMDFile
+    dwError = TDNFEventContextGetItemString(
+                  pContext,
+                  TDNF_EVENT_ITEM_REPO_MD_FILE,
+                  (const char **)&pszRepoMDFile);
+    BAIL_ON_TDNF_ERROR(dwError);
 
     dwError = TDNFJoinPath(&pszTmpRepoMetalinkFile,
                             pszTmpRepoDataDir,
                             TDNF_REPO_METALINK_FILE_NAME,
                             NULL);
     BAIL_ON_TDNF_ERROR(dwError);
-    dwError = TDNFJoinPath(&pszTempBaseUrlFile,
+    dwError = TDNFJoinPath(&pszTmpBaseUrlFile,
                             pszTmpRepoDataDir,
                             TDNF_REPO_BASEURL_FILE_NAME,
                             NULL);
     BAIL_ON_TDNF_ERROR(dwError);
-    dwError = TDNFDownloadFile(pHandle->pTdnf, pszId, pHandle->pszRepoMetalinkURL,
-                                pszTmpRepoMetalinkFile, pszId);
+    dwError = TDNFDownloadFile(pHandle->pTdnf, pszRepoId, pHandle->pszRepoMetalinkURL,
+                                pszTmpRepoMetalinkFile, pszRepoId);
     BAIL_ON_TDNF_ERROR(dwError);
 
     dwError = TDNFAllocateMemory(1, sizeof(TDNF_ML_CTX),
@@ -243,7 +311,7 @@ TDNFMetalinkerMDDownload(
     BAIL_ON_TDNF_ERROR(dwError);
 
     dwError = TDNFParseAndGetURLFromMetalink(pHandle->pTdnf,
-                pszId, pszTmpRepoMetalinkFile, ml_ctx);
+                pszRepoId, pszTmpRepoMetalinkFile, ml_ctx);
     BAIL_ON_TDNF_ERROR(dwError);
 
     nReplaceRepoMD = 1;
@@ -262,9 +330,9 @@ TDNFMetalinkerMDDownload(
     {
         dwError = TDNFDownloadUsingMetalinkResources(
                     pHandle->pTdnf,
-                    pszId,
+                    pszRepoId,
                     pszTmpRepoMDFile,
-                    pszId,
+                    pszRepoId,
                     &pszRepoMDUrl,
                     ml_ctx);
         BAIL_ON_TDNF_ERROR(dwError);
@@ -274,30 +342,52 @@ TDNFMetalinkerMDDownload(
         dwError = TDNFCheckRepoMDFileHashFromMetalink(pszTmpRepoMDFile , ml_ctx);
         BAIL_ON_TDNF_ERROR(dwError);
 
-        dwError = TDNFRepoSetBaseUrl(pTdnf, pRepoData, pszTempBaseUrlFile);
+        dwError = TDNFRepoSetBaseUrl(pHandle->pTdnf, pRepoData, pszTmpBaseUrlFile);
         BAIL_ON_TDNF_ERROR(dwError);
         nReplacebaseURL = 1;
         nNewRepoMDFile = 1;
 
         if (!access(pszRepoMDFile, F_OK))
         {
-            memset(pszCookie, 0, SOLV_COOKIE_LEN);
+            memset(pHandle->pszCookie, 0, sizeof(char)*SOLV_COOKIE_LEN);
             memset(pszTmpCookie, 0, SOLV_COOKIE_LEN);
-            dwError = SolvCalculateCookieForFile(pszRepoMDFile, pszCookie);
+            dwError = SolvCalculateCookieForFile(pszRepoMDFile, *pHandle->pszCookie);
             BAIL_ON_TDNF_ERROR(dwError);
             dwError = SolvCalculateCookieForFile(pszTmpRepoMDFile, pszTmpCookie);
             BAIL_ON_TDNF_ERROR(dwError);
-            if (!memcmp (pszCookie, pszTmpCookie, sizeof(pszTmpCookie)))
+            if (!memcmp (pHandle->pszCookie, pszTmpCookie, sizeof(pszTmpCookie)))
             {
                 nReplaceRepoMD = 0;
             }
         }
     }
 
-    if (!nReplaceBaseURL && !access(pszBaseUrlFile, F_OK))
+    if (!nReplacebaseURL && !access(pHandle->pszBaseUrlFile, F_OK))
     {
-
+        /* if metalink url is present, then, we will need to
+           set the base url to the url which is used to download the repomd */
+        dwError = TDNFRepoSetBaseUrl(pHandle->pTdnf, pRepoData, pHandle->pszBaseUrlFile);
+        BAIL_ON_TDNF_ERROR(dwError);
     }
+
+    if (nReplacebaseURL)
+    {
+        dwError = TDNFReplaceFile(pszTmpRepoMetalinkFile, pHandle->pszMetaLinkFile);
+        BAIL_ON_TDNF_ERROR(dwError);
+        dwError = TDNFReplaceFile(pszTmpBaseUrlFile, pHandle->pszBaseUrlFile);
+        BAIL_ON_TDNF_ERROR(dwError);
+    }
+
+cleanup:
+    if (ml_ctx)
+    {
+        TDNFMetalinkFree(ml_ctx);
+        ml_ctx = NULL;
+    }
+    return dwError;
+error:
+    pr_err("Error(%u) %s : %s\n", __FUNCTION__, dwError);
+    goto cleanup;
 }
 
 uint32_t

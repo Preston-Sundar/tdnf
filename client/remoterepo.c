@@ -196,7 +196,7 @@ TDNFGetDigestForFile(
     fd = open(filename, O_RDONLY);
     if (fd < 0)
     {
-        pr_err("Metalink: validating (%s) FAILED\n", filename);
+        pr_err("%s: validating (%s) FAILED\n", __FUNCTION__, filename);
         dwError = errno;
         BAIL_ON_TDNF_SYSTEM_ERROR_UNCOND(dwError);
     }
@@ -250,7 +250,7 @@ TDNFGetDigestForFile(
 
     if (length == -1)
     {
-        pr_err("Metalink: validating (%s) FAILED\n", filename);
+        pr_err("%s: validating (%s) FAILED\n", __FUNCTION__, filename);
         dwError = errno;
         BAIL_ON_TDNF_SYSTEM_ERROR(dwError);
     }
@@ -319,66 +319,66 @@ cleanup:
 error:
     if (!IsNullOrEmptyString(filename))
     {
-        pr_err("Error: Validating metalink (%s) FAILED (digest mismatch)\n", filename);
+        pr_err("Error: Validating (%s) FAILED (digest mismatch)\n", filename);
     }
     goto cleanup;
 }
 
 // Moved
-uint32_t
-TDNFCheckRepoMDFileHashFromMetalink(
-    char *pszFile,
-    TDNF_ML_CTX *ml_ctx
-    )
-{
-    uint32_t dwError = 0;
-    TDNF_ML_HASH_LIST *hashList = NULL;
-    TDNF_ML_HASH_INFO *hashInfo = NULL;
-    unsigned char digest[EVP_MAX_MD_SIZE] = {0};
-    int hash_Type = -1;
-    TDNF_ML_HASH_INFO *currHashInfo = NULL;
+// uint32_t
+// TDNFCheckRepoMDFileHashFromMetalink(
+//     char *pszFile,
+//     TDNF_ML_CTX *ml_ctx
+//     )
+// {
+//     uint32_t dwError = 0;
+//     TDNF_ML_HASH_LIST *hashList = NULL;
+//     TDNF_ML_HASH_INFO *hashInfo = NULL;
+//     unsigned char digest[EVP_MAX_MD_SIZE] = {0};
+//     int hash_Type = -1;
+//     TDNF_ML_HASH_INFO *currHashInfo = NULL;
 
-    if(IsNullOrEmptyString(pszFile) ||
-       !ml_ctx)
-    {
-        dwError = ERROR_TDNF_INVALID_PARAMETER;
-        BAIL_ON_TDNF_ERROR(dwError);
-    }
+//     if(IsNullOrEmptyString(pszFile) ||
+//        !ml_ctx)
+//     {
+//         dwError = ERROR_TDNF_INVALID_PARAMETER;
+//         BAIL_ON_TDNF_ERROR(dwError);
+//     }
 
-    for(hashList = ml_ctx->hashes; hashList; hashList = hashList->next)
-    {
-        int currHashType = TDNF_HASH_SENTINEL;
-        currHashInfo = hashList->data;
+//     for(hashList = ml_ctx->hashes; hashList; hashList = hashList->next)
+//     {
+//         int currHashType = TDNF_HASH_SENTINEL;
+//         currHashInfo = hashList->data;
 
-        if(currHashInfo == NULL)
-        {
-            dwError = ERROR_TDNF_INVALID_REPO_FILE;
-            BAIL_ON_TDNF_ERROR(dwError);
-        }
+//         if(currHashInfo == NULL)
+//         {
+//             dwError = ERROR_TDNF_INVALID_REPO_FILE;
+//             BAIL_ON_TDNF_ERROR(dwError);
+//         }
 
-        dwError = TDNFGetResourceType(currHashInfo->type, &currHashType);
-        BAIL_ON_TDNF_ERROR(dwError);
+//         dwError = TDNFGetResourceType(currHashInfo->type, &currHashType);
+//         BAIL_ON_TDNF_ERROR(dwError);
 
-        if ((hash_Type > currHashType)||
-           (!TDNFCheckHexDigest(currHashInfo->value, hash_ops[currHashType].length)))
-        {
-            continue;
-        }
-        hash_Type = currHashType;
-        hashInfo = currHashInfo;
-    }
+//         if ((hash_Type > currHashType)||
+//            (!TDNFCheckHexDigest(currHashInfo->value, hash_ops[currHashType].length)))
+//         {
+//             continue;
+//         }
+//         hash_Type = currHashType;
+//         hashInfo = currHashInfo;
+//     }
 
-    dwError = TDNFChecksumFromHexDigest(hashInfo->value, digest);
-    BAIL_ON_TDNF_ERROR(dwError);
+//     dwError = TDNFChecksumFromHexDigest(hashInfo->value, digest);
+//     BAIL_ON_TDNF_ERROR(dwError);
 
-    dwError = TDNFCheckHash(pszFile, digest, hash_Type);
-    BAIL_ON_TDNF_ERROR(dwError);
+//     dwError = TDNFCheckHash(pszFile, digest, hash_Type);
+//     BAIL_ON_TDNF_ERROR(dwError);
 
-cleanup:
-    return dwError;
-error:
-    goto cleanup;
-}
+// cleanup:
+//     return dwError;
+// error:
+//     goto cleanup;
+// }
 
 /* Returns nonzero if hex_digest is properly formatted; that is each
    letter is in [0-9A-Za-z] and the length of the string equals to the
@@ -483,53 +483,53 @@ error:
 }
 
 // METALINK PLUGIN -- MOVED
-uint32_t
-TDNFParseAndGetURLFromMetalink(
-    PTDNF pTdnf,
-    const char *pszRepo,
-    const char *pszFile,
-    TDNF_ML_CTX *ml_ctx
-    )
-{
-    int fd = -1;
-    uint32_t dwError = 0;
+// uint32_t
+// TDNFParseAndGetURLFromMetalink(
+//     PTDNF pTdnf,
+//     const char *pszRepo,
+//     const char *pszFile,
+//     TDNF_ML_CTX *ml_ctx
+//     )
+// {
+//     int fd = -1;
+//     uint32_t dwError = 0;
 
-    if (!pTdnf ||
-       !pTdnf->pArgs ||
-       IsNullOrEmptyString(pszRepo) ||
-       IsNullOrEmptyString(pszFile) ||
-       !ml_ctx)
-    {
-        dwError = ERROR_TDNF_INVALID_PARAMETER;
-        BAIL_ON_TDNF_ERROR(dwError);
-    }
+//     if (!pTdnf ||
+//        !pTdnf->pArgs ||
+//        IsNullOrEmptyString(pszRepo) ||
+//        IsNullOrEmptyString(pszFile) ||
+//        !ml_ctx)
+//     {
+//         dwError = ERROR_TDNF_INVALID_PARAMETER;
+//         BAIL_ON_TDNF_ERROR(dwError);
+//     }
 
-    fd = open(pszFile, O_RDONLY);
-    if (fd < 0)
-    {
-        dwError = errno;
-        BAIL_ON_TDNF_SYSTEM_ERROR_UNCOND(dwError);
-    }
+//     fd = open(pszFile, O_RDONLY);
+//     if (fd < 0)
+//     {
+//         dwError = errno;
+//         BAIL_ON_TDNF_SYSTEM_ERROR_UNCOND(dwError);
+//     }
 
-    dwError = TDNFMetalinkParseFile(ml_ctx, fd, TDNF_REPO_METADATA_FILE_NAME);
-    if (dwError)
-    {
-        pr_err("Unable to parse metalink, ERROR: code=%d\n", dwError);
-        BAIL_ON_TDNF_ERROR(dwError);
-    }
+//     dwError = TDNFMetalinkParseFile(ml_ctx, fd, TDNF_REPO_METADATA_FILE_NAME);
+//     if (dwError)
+//     {
+//         pr_err("Unable to parse metalink, ERROR: code=%d\n", dwError);
+//         BAIL_ON_TDNF_ERROR(dwError);
+//     }
 
-    //sort the URL's in List based on preference.
-    TDNFSortListOnPreference(&ml_ctx->urls);
+//     //sort the URL's in List based on preference.
+//     TDNFSortListOnPreference(&ml_ctx->urls);
 
-cleanup:
-    if (fd >= 0)
-    {
-        close(fd);
-    }
-    return dwError;
-error:
-    goto cleanup;
-}
+// cleanup:
+//     if (fd >= 0)
+//     {
+//         close(fd);
+//     }
+//     return dwError;
+// error:
+//     goto cleanup;
+// }
 
 uint32_t
 TDNFDownloadFile(

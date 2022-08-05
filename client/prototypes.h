@@ -256,19 +256,32 @@ TDNFChecksumFromHexDigest(
     unsigned char *ppdigest
     );
 
-uint32_t
-TDNFCheckRepoMDFileHashFromMetalink(
-    char *pszFile,
-    TDNF_ML_CTX *ml_ctx
+int
+TDNFGetResourceType(
+    const char *resource_type,
+    int *type
     );
 
 uint32_t
-TDNFParseAndGetURLFromMetalink(
-    PTDNF pTdnf,
-    const char *pszRepo,
-    const char *pszFile,
-    TDNF_ML_CTX *ml_ctx
+TDNFCheckHash(
+    const char *filename,
+    unsigned char *digest,
+    int type
     );
+
+// uint32_t
+// TDNFCheckRepoMDFileHashFromMetalink(
+//     char *pszFile,
+//     TDNF_ML_CTX *ml_ctx
+//     );
+
+// uint32_t
+// TDNFParseAndGetURLFromMetalink(
+//     PTDNF pTdnf,
+//     const char *pszRepo,
+//     const char *pszFile,
+//     TDNF_ML_CTX *ml_ctx
+//     );
 
 uint32_t
 TDNFDownloadFile(
@@ -1198,62 +1211,62 @@ TDNFListInternal(
 
 // metalink.c
 
-uint32_t
-TDNFMetalinkParseFile(
-    TDNF_ML_CTX *ml_ctx,
-    int fd,
-    const char *filename
-    );
+// uint32_t
+// TDNFMetalinkParseFile(
+//     TDNF_ML_CTX *ml_ctx,
+//     int fd,
+//     const char *filename
+//     );
 
-void
-TDNFMetalinkFree(
-    TDNF_ML_CTX *ml_ctx
-    );
+// void
+// TDNFMetalinkFree(
+//     TDNF_ML_CTX *ml_ctx
+//     );
 
-uint32_t
-TDNFXmlParseData(
-    TDNF_ML_CTX *ml_ctx,
-    xmlNode *node,
-    const char *filename
-    );
+// uint32_t
+// TDNFXmlParseData(
+//     TDNF_ML_CTX *ml_ctx,
+//     xmlNode *node,
+//     const char *filename
+//     );
 
-uint32_t
-TDNFParseFileTag(
-    TDNF_ML_CTX *ml_ctx,
-    xmlNode *node,
-    const char *filename
-    );
+// uint32_t
+// TDNFParseFileTag(
+//     TDNF_ML_CTX *ml_ctx,
+//     xmlNode *node,
+//     const char *filename
+//     );
 
-uint32_t
-TDNFParseHashTag(
-    TDNF_ML_CTX *ml_ctx,
-    xmlNode *node
-    );
+// uint32_t
+// TDNFParseHashTag(
+//     TDNF_ML_CTX *ml_ctx,
+//     xmlNode *node
+//     );
 
 
-uint32_t
-TDNFParseUrlTag(
-    TDNF_ML_CTX *ml_ctx,
-    xmlNode *node
-    );
+// uint32_t
+// TDNFParseUrlTag(
+//     TDNF_ML_CTX *ml_ctx,
+//     xmlNode *node
+//     );
 
-// list.c
-void
-TDNFSortListOnPreference(
-    TDNF_ML_LIST** headUrl
-);
+// // list.c
+// void
+// TDNFSortListOnPreference(
+//     TDNF_ML_LIST** headUrl
+// );
 
-uint32_t
-TDNFAppendList(
-    TDNF_ML_LIST** head_ref,
-    void *new_data
-);
+// uint32_t
+// TDNFAppendList(
+//     TDNF_ML_LIST** head_ref,
+//     void *new_data
+// );
 
-void
-TDNFDeleteList(
-    TDNF_ML_LIST** head_ref,
-    TDNF_ML_FREE_FUNC free_func
-);
+// void
+// TDNFDeleteList(
+//     TDNF_ML_LIST** head_ref,
+//     TDNF_ML_FREE_FUNC free_func
+// );
 
 
 uint32_t

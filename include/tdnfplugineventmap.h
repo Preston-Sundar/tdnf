@@ -26,12 +26,14 @@ TDNFPluginGetEventMapVersion(
 
 #define TDNF_EVENT_ITEM_TDNF_HANDLE          "tdnf.handle"
 #define TDNF_EVENT_ITEM_REPO_SECTION         "repo.section"
+#define TDNF_EVENT_ITEM_REPO_DATA            "repo.dataptr"
 #define TDNF_EVENT_ITEM_REPO_ID              "repo.id"
 #define TDNF_EVENT_ITEM_REPO_DATADIR         "repo.datadir"
 #define TDNF_EVENT_ITEM_REPO_SOLV_COOKIE     "repo.solvcookie"
 #define TDNF_EVENT_ITEM_REPO_PLUGIN_URL      "plugin.url"
 #define TDNF_EVENT_ITEM_REPO_MD_URL          "repomd.url"
 #define TDNF_EVENT_ITEM_REPO_MD_FILE         "repomd.file"
+#define TDNF_EVENT_ITEM_REPO_MD_TMP_FILE     "repomd.tmpfile"
 #define TDNF_EVENT_ITEM_REPO_MD_TMP_DATA_DIR "repomd.tmpdatadir"
 
 typedef enum

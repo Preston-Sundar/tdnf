@@ -127,6 +127,7 @@ TDNFStoreBaseURLFromMetalink(
     const char *pszRepoMDURL
     );
 
+uint32_t
 TDNFDownloadUsingMetalinkResources(
     PTDNF pTdnf,
     const char *pszRepo,
