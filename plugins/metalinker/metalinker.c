@@ -111,18 +111,28 @@ TDNFMetalinkerCheckFile(
     uint32_t dwError = 0;
     char* pszRepoDataDir = NULL;
     char* pszMetaLink = NULL;
+    char* pszRepoMetaLinkURL = NULL;
 
-    // DEBUG
-    // pr_info("\t %s() \n", __FUNCTION__);
-    // pr_info("\t %s \n", pContext->pData->pcszStr);
+    dwError = TDNFEventContextGetItemString(
+                    pContext,
+                    TDNF_EVENT_ITEM_REPO_DATADIR,
+                    (const char **)&pszRepoDataDir);
+    BAIL_ON_TDNF_ERROR(dwError);
+
+    dwError = TDNFEventContextGetItemString(
+                    pContext,
+                    TDNF_EVENT_ITEM_REPO_PLUGIN_URL,
+                    (const char **)&pszRepoMetaLinkURL);
+    BAIL_ON_TDNF_ERROR(dwError);
+
     dwError = TDNFJoinPath(&pHandle->pszMetaLinkFile,
-                           pContext->pData->pcszStr,
+                           pszRepoDataDir,
                            TDNF_REPO_METALINK_FILE_NAME,
                            NULL);
     BAIL_ON_TDNF_ERROR(dwError);
 
     dwError = TDNFJoinPath(&pHandle->pszBaseUrlFile,
-                           pContext->pData->pcszStr,
+                           pszRepoDataDir,
                            TDNF_REPO_BASEURL_FILE_NAME,
                            NULL);
     BAIL_ON_TDNF_ERROR(dwError);
@@ -386,7 +396,7 @@ cleanup:
     }
     return dwError;
 error:
-    pr_err("Error(%u) %s : %s\n", __FUNCTION__, dwError);
+    pr_err("Error(%u) : %s\n", dwError, __FUNCTION__);
     goto cleanup;
 }
 

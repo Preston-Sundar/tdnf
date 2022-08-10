@@ -840,11 +840,11 @@ TDNFGetRepoMD(
     BAIL_ON_TDNF_ERROR(dwError);
 
     /******METALINK****** -- DONE */
-    dwError = TDNFJoinPath(&pszMetaLinkFile,
-                           pszRepoDataDir,
-                           TDNF_REPO_METALINK_FILE_NAME,
-                           NULL);
-    BAIL_ON_TDNF_ERROR(dwError);
+    // dwError = TDNFJoinPath(&pszMetaLinkFile,
+    //                        pszRepoDataDir,
+    //                        TDNF_REPO_METALINK_FILE_NAME,
+    //                        NULL);
+    // BAIL_ON_TDNF_ERROR(dwError);
     /******METALINK****** -- DONE */
 
     dwError = TDNFAllocateMemory(
@@ -1124,7 +1124,7 @@ TDNFGetRepoMD(
         BAIL_ON_TDNF_ERROR(dwError);
     }
 
-    printf("\t%s\tDEBUG:\n\t\t%s\n\t\t%s\n", __FUNCTION__, pszTmpRepoMetalinkFile, pszMetaLinkFile);
+    //printf("\t%s\tDEBUG:\n\t\t%s\n\t\t%s\n", __FUNCTION__, pszTmpRepoMetalinkFile, pszMetaLinkFile);
     /******METALINK****** -- DONE */
     // if (metalink && nReplacebaseURL)
     // {
