@@ -20,6 +20,7 @@ typedef struct _TDNF_PLUGIN_HANDLE_
     uint32_t nNeedDownload; /* metalink file is valid, a download is needed. */
     unsigned char* pszCookie[SOLV_COOKIE_LEN]; /* libsolv cookie for metalink file. */
     char* pszRepoMetalinkURL; /* url for metalink repository. */
+    PTDNF_PLUGIN_MD_FLAGS pStatusFlags; /* track md download states, shared with TDNF. */
 
 }TDNF_PLUGIN_HANDLE, *PTDNF_PLUGIN_HANDLE;
 

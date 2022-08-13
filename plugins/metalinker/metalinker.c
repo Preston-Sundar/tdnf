@@ -131,6 +131,14 @@ TDNFMetalinkerCheckFile(
                            NULL);
     BAIL_ON_TDNF_ERROR(dwError);
 
+    // Create the repodata directory if it is missing.
+    dwError = TDNFUtilsMakeDir(pszRepoDataDir);
+    if(dwError == ERROR_TDNF_ALREADY_EXISTS)
+    {
+        dwError = 0;
+    }
+    BAIL_ON_TDNF_ERROR(dwError);
+
     dwError = TDNFJoinPath(&pHandle->pszBaseUrlFile,
                            pszRepoDataDir,
                            TDNF_REPO_BASEURL_FILE_NAME,
@@ -159,6 +167,13 @@ TDNFMetalinkerCheckFile(
     // TODO: dealloc in plugin exit or error. 
     dwError = TDNFAllocateString(pszMetaLink,
                                  &(pHandle->pszRepoMetalinkURL));
+    BAIL_ON_TDNF_ERROR(dwError);
+
+    /* get the status flags struct ptr used for metadata download. */
+    dwError = TDNFEventContextGetItemPtr(
+                    pContext,
+                    TDNF_EVENT_ITEM_REPO_MD_STATUS_FLAGS,
+                    &pHandle->pStatusFlags);
     BAIL_ON_TDNF_ERROR(dwError);
 
     TDNFDebugDumpPluginHandle(pHandle);

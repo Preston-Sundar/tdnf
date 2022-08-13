@@ -81,6 +81,14 @@ typedef struct _TDNF_EVENT_DATA_
     struct _TDNF_EVENT_DATA_ *pNext;
 } TDNF_EVENT_DATA, *PTDNF_EVENT_DATA;
 
+typedef struct _TDNF_PLUGIN_MD_FLAGS_
+{
+    int nNeedDownload;
+    int nNewRepoMDFile;
+    int nReplaceRepoMD;
+    int nReplacebaseURL;
+} TDNF_PLUGIN_MD_FLAGS, *PTDNF_PLUGIN_MD_FLAGS;
+
 //Metalink Structures. -- DONE
 // typedef struct _TDNF_ML_LIST_
 // {

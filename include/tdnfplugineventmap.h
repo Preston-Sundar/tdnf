@@ -35,6 +35,7 @@ TDNFPluginGetEventMapVersion(
 #define TDNF_EVENT_ITEM_REPO_MD_FILE         "repomd.file"
 #define TDNF_EVENT_ITEM_REPO_MD_TMP_FILE     "repomd.tmpfile"
 #define TDNF_EVENT_ITEM_REPO_MD_TMP_DATA_DIR "repomd.tmpdatadir"
+#define TDNF_EVENT_ITEM_REPO_MD_STATUS_FLAGS "repomd.statusflags"
 
 typedef enum
 {
