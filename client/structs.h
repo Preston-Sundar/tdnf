@@ -87,6 +87,8 @@ typedef struct _TDNF_PLUGIN_MD_FLAGS_
     int nNewRepoMDFile;
     int nReplaceRepoMD;
     int nReplacebaseURL;
+    int nPluginHandlesDownload; /* set by a plugin that handles downloading metadata. */
+    int nPluginHandlesRefresh; /* set by a plugin that handles refresh. */
 } TDNF_PLUGIN_MD_FLAGS, *PTDNF_PLUGIN_MD_FLAGS;
 
 //Metalink Structures. -- DONE

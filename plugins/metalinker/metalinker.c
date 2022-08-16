@@ -27,17 +27,6 @@ typedef struct _hash_type {
     unsigned int hash_value;
 }hash_type;
 
-static hash_type hashType[] =
-    {
-        {"md5", TDNF_HASH_MD5},
-        {"sha1", TDNF_HASH_SHA1},
-        {"sha-1", TDNF_HASH_SHA1},
-        {"sha256", TDNF_HASH_SHA256},
-        {"sha-256", TDNF_HASH_SHA256},
-        {"sha512", TDNF_HASH_SHA512},
-        {"sha-512", TDNF_HASH_SHA512}
-    };
-
 uint32_t
 TDNFMetalinkerXMLCheckVersion(
     )
@@ -145,6 +134,19 @@ TDNFMetalinkerCheckFile(
                            NULL);
     BAIL_ON_TDNF_ERROR(dwError);
 
+    /* get the status flags struct ptr used for metadata download. */
+    dwError = TDNFEventContextGetItemPtr(
+                    pContext,
+                    TDNF_EVENT_ITEM_REPO_MD_STATUS_FLAGS,
+                    (const void **)&pHandle->pStatusFlags);
+    BAIL_ON_TDNF_ERROR(dwError);
+
+    /* set status flag to indicate that plugin handles repomd.xml download */
+    pHandle->pStatusFlags->nPluginHandlesDownload = 1;
+
+    /* set status flag to indicate that plugin handles refresh */
+    pHandle->pStatusFlags->nPluginHandlesRefresh = 1;
+
     /* if metalink file is not present, set flag to download */
     if (access(pHandle->pszMetaLinkFile, F_OK) || access(pHandle->pszBaseUrlFile, F_OK))
     {
@@ -153,7 +155,7 @@ TDNFMetalinkerCheckFile(
             dwError = errno;
             BAIL_ON_TDNF_SYSTEM_ERROR(dwError);
         }
-        pHandle->nNeedDownload = 1;
+        pHandle->pStatusFlags->nNeedDownload = 1;
     }
 
     /* set the metalinker server repo link */
@@ -169,13 +171,7 @@ TDNFMetalinkerCheckFile(
                                  &(pHandle->pszRepoMetalinkURL));
     BAIL_ON_TDNF_ERROR(dwError);
 
-    /* get the status flags struct ptr used for metadata download. */
-    dwError = TDNFEventContextGetItemPtr(
-                    pContext,
-                    TDNF_EVENT_ITEM_REPO_MD_STATUS_FLAGS,
-                    &pHandle->pStatusFlags);
-    BAIL_ON_TDNF_ERROR(dwError);
-
+    // DEBUG
     TDNFDebugDumpPluginHandle(pHandle);
 
 
@@ -274,10 +270,10 @@ TDNFMetalinkerMDDownload(
     char *pszTmpRepoDataDir = NULL;
     char *pszTmpRepoMetalinkFile = NULL;
     unsigned char pszTmpCookie[SOLV_COOKIE_LEN] = {0};
-    // char *pszId = NULL;
-    int nNewRepoMDFile = 0;
-    int nReplaceRepoMD = 0;
-    int nReplacebaseURL = 0;
+    PTDNF_PLUGIN_MD_FLAGS pStatusFlags = pHandle->pStatusFlags;
+    // int nNewRepoMDFile = 0;
+    // int nReplaceRepoMD = 0;
+    // int nReplacebaseURL = 0;
     TDNF_ML_CTX *ml_ctx = NULL;
 
     //TODO: Get needed vars from plugin handle. pRepoData
@@ -305,11 +301,11 @@ TDNFMetalinkerMDDownload(
                   (const char **)&pszTmpRepoMDFile);
     BAIL_ON_TDNF_ERROR(dwError);
     // //TODO: Get needed vars from plugin handle. pszRepoMDUrl
-    // dwError = TDNFEventContextGetItemString(
-    //               pContext,
-    //               TDNF_EVENT_ITEM_REPO_MD_URL,
-    //               (const char **)&pszRepoMDUrl);
-    // BAIL_ON_TDNF_ERROR(dwError);
+    dwError = TDNFEventContextGetItemPtr(
+                  pContext,
+                  TDNF_EVENT_ITEM_REPO_MD_URL,
+                  (const void **)&pszRepoMDUrl);
+    BAIL_ON_TDNF_ERROR(dwError);
     //TODO: Get needed vars from plugin handle. pszRepoMDFile
     dwError = TDNFEventContextGetItemString(
                   pContext,
@@ -339,7 +335,7 @@ TDNFMetalinkerMDDownload(
                 pszRepoId, pszTmpRepoMetalinkFile, ml_ctx);
     BAIL_ON_TDNF_ERROR(dwError);
 
-    nReplaceRepoMD = 1;
+    pStatusFlags->nReplaceRepoMD = 1;
     if (pHandle->pszCookie[0])
     {
         dwError = SolvCalculateCookieForFile(pszTmpRepoMetalinkFile, pszTmpCookie);
@@ -347,11 +343,11 @@ TDNFMetalinkerMDDownload(
 
         if (!memcmp (pHandle->pszCookie, pszTmpCookie, sizeof(pszTmpCookie)))
         {
-            nReplaceRepoMD = 0;
+            pStatusFlags->nReplaceRepoMD = 0;
         }
     }
 
-    if (nReplaceRepoMD)
+    if (pStatusFlags->nReplaceRepoMD)
     {
         dwError = TDNFDownloadUsingMetalinkResources(
                     pHandle->pTdnf,
@@ -369,12 +365,15 @@ TDNFMetalinkerMDDownload(
 
         dwError = TDNFRepoSetBaseUrl(pHandle->pTdnf, pRepoData, pszTmpBaseUrlFile);
         BAIL_ON_TDNF_ERROR(dwError);
-        nReplacebaseURL = 1;
-        nNewRepoMDFile = 1;
+        pStatusFlags->nReplacebaseURL = 1;
+        pStatusFlags->nNewRepoMDFile = 1;
+
 
         if (!access(pszRepoMDFile, F_OK))
         {
-            memset(pHandle->pszCookie, 0, sizeof(char)*SOLV_COOKIE_LEN);
+            // TODO: figure out why SOLV_COOKIE_LEN instead of 
+            // sizeof(pHandle->pszCookie) causes gcc warnings.
+            memset(pHandle->pszCookie, 0, sizeof(pHandle->pszCookie));
             memset(pszTmpCookie, 0, SOLV_COOKIE_LEN);
             dwError = SolvCalculateCookieForFile(pszRepoMDFile, *pHandle->pszCookie);
             BAIL_ON_TDNF_ERROR(dwError);
@@ -382,12 +381,12 @@ TDNFMetalinkerMDDownload(
             BAIL_ON_TDNF_ERROR(dwError);
             if (!memcmp (pHandle->pszCookie, pszTmpCookie, sizeof(pszTmpCookie)))
             {
-                nReplaceRepoMD = 0;
+                pStatusFlags->nReplaceRepoMD = 0;
             }
         }
     }
 
-    if (!nReplacebaseURL && !access(pHandle->pszBaseUrlFile, F_OK))
+    if (!pStatusFlags->nReplacebaseURL && !access(pHandle->pszBaseUrlFile, F_OK))
     {
         /* if metalink url is present, then, we will need to
            set the base url to the url which is used to download the repomd */
@@ -395,7 +394,7 @@ TDNFMetalinkerMDDownload(
         BAIL_ON_TDNF_ERROR(dwError);
     }
 
-    if (nReplacebaseURL)
+    if (pStatusFlags->nReplacebaseURL)
     {
         dwError = TDNFReplaceFile(pszTmpRepoMetalinkFile, pHandle->pszMetaLinkFile);
         BAIL_ON_TDNF_ERROR(dwError);
