@@ -119,30 +119,6 @@ TDNFParseUrlTag(
     TDNF_ML_CTX *ml_ctx,
     xmlNode *node
     );
-uint32_t
-TDNFGetCachePath(
-    PTDNF pTdnf,
-    PTDNF_REPO_DATA pRepo,
-    const char *pszSubDir,
-    const char *pszFileName,
-    char **ppszPath
-);
-uint32_t
-TDNFGetCachePath(
-    PTDNF pTdnf,
-    PTDNF_REPO_DATA pRepo,
-    const char *pszSubDir,
-    const char *pszFileName,
-    char **ppszPath
-);
-uint32_t
-TDNFGetCachePath(
-    PTDNF pTdnf,
-    PTDNF_REPO_DATA pRepo,
-    const char *pszSubDir,
-    const char *pszFileName,
-    char **ppszPath
-);
 
 uint32_t
 TDNFStoreBaseURLFromMetalink(
