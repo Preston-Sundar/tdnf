@@ -547,6 +547,7 @@ TDNFEventRepoMDDownloadStart(
 
     if (!pTdnf || !pRepoData ||
         IsNullOrEmptyString(pcszRepoId) ||
+        IsNullOrEmptyString(ppcszRepoMDUrl) ||
         IsNullOrEmptyString(pcszTmpRepoMDFile) ||
         IsNullOrEmptyString(pcszRepoMDFile) ||
         IsNullOrEmptyString(pcszTmpRepoDataDir))
@@ -785,14 +786,14 @@ TDNFGetRepoMD(
 {
     uint32_t dwError = 0;
     char *pszRepoMDFile = NULL;
-    char *pszRepoMDUrl = NULL;
+    char *pszRepoMDUrl = "Hi there!";
     char *pszTmpRepoDataDir = NULL;
     char *pszTmpRepoMDFile = NULL;
-    char *pszMetaLinkFile = NULL;
+    // char *pszMetaLinkFile = NULL;
     char *pszBaseUrlFile = NULL;
     char *pszTempBaseUrlFile = NULL;
     // char *pszRepoMetalink = NULL;
-    char *pszTmpRepoMetalinkFile = NULL;
+    // char *pszTmpRepoMetalinkFile = NULL;
     char* pszLastRefreshMarker = NULL;
     PTDNF_REPO_METADATA pRepoMDRel = NULL;
     PTDNF_REPO_METADATA pRepoMD = NULL;

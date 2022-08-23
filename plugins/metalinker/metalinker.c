@@ -276,37 +276,37 @@ TDNFMetalinkerMDDownload(
     // int nReplacebaseURL = 0;
     TDNF_ML_CTX *ml_ctx = NULL;
 
-    //TODO: Get needed vars from plugin handle. pRepoData
+    // Get needed vars from plugin handle. pRepoData
     dwError = TDNFEventContextGetItemPtr(
                   pContext,
                   TDNF_EVENT_ITEM_REPO_DATA,
                   (const void **)&pRepoData);
     BAIL_ON_TDNF_ERROR(dwError);
-    //TODO: Get needed vars from plugin handle. pszTmpRepoDataDir
+    // Get needed vars from plugin handle. pszTmpRepoDataDir
     dwError = TDNFEventContextGetItemString(
                   pContext,
                   TDNF_EVENT_ITEM_REPO_MD_TMP_DATA_DIR,
                   (const char **)&pszTmpRepoDataDir);
     BAIL_ON_TDNF_ERROR(dwError);
-    //TODO: Get needed vars from plugin handle. pszRepoId
+    // Get needed vars from plugin handle. pszRepoId
     dwError = TDNFEventContextGetItemString(
                   pContext,
                   TDNF_EVENT_ITEM_REPO_ID,
                   (const char **)&pszRepoId);
     BAIL_ON_TDNF_ERROR(dwError);
-    //TODO: Get needed vars from plugin handle. pszTmpRepoMDFile
+    // Get needed vars from plugin handle. pszTmpRepoMDFile
     dwError = TDNFEventContextGetItemString(
                   pContext,
                   TDNF_EVENT_ITEM_REPO_MD_TMP_FILE,
                   (const char **)&pszTmpRepoMDFile);
     BAIL_ON_TDNF_ERROR(dwError);
-    // //TODO: Get needed vars from plugin handle. pszRepoMDUrl
+    // Get needed vars from plugin handle. pszRepoMDUrl
     dwError = TDNFEventContextGetItemPtr(
                   pContext,
                   TDNF_EVENT_ITEM_REPO_MD_URL,
                   (const void **)&pszRepoMDUrl);
     BAIL_ON_TDNF_ERROR(dwError);
-    //TODO: Get needed vars from plugin handle. pszRepoMDFile
+    // Get needed vars from plugin handle. pszRepoMDFile
     dwError = TDNFEventContextGetItemString(
                   pContext,
                   TDNF_EVENT_ITEM_REPO_MD_FILE,
@@ -354,7 +354,7 @@ TDNFMetalinkerMDDownload(
                     pszRepoId,
                     pszTmpRepoMDFile,
                     pszRepoId,
-                    &pszRepoMDUrl,
+                    pszRepoMDUrl,
                     ml_ctx);
         BAIL_ON_TDNF_ERROR(dwError);
 
@@ -949,6 +949,10 @@ TDNFDownloadUsingMetalinkResources(
                                NULL);
         BAIL_ON_TDNF_ERROR(dwError);
         *ppszRepoMDUrl = pszRepoMDUrl;
+        
+        dwError = TDNFAllocateString(pszRepoMDUrl, ppszRepoMDUrl);
+        BAIL_ON_TDNF_ERROR(dwError);
+
         break;
     }
 
@@ -956,6 +960,7 @@ cleanup:
     return dwError;
 error:
     TDNF_SAFE_FREE_MEMORY(pszRepoMDUrl);
+    TDNF_SAFE_FREE_MEMORY(ppszRepoMDUrl);
     *ppszRepoMDUrl = NULL;
     goto cleanup;
 }
