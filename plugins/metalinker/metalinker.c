@@ -949,10 +949,6 @@ TDNFDownloadUsingMetalinkResources(
                                NULL);
         BAIL_ON_TDNF_ERROR(dwError);
         *ppszRepoMDUrl = pszRepoMDUrl;
-        
-        dwError = TDNFAllocateString(pszRepoMDUrl, ppszRepoMDUrl);
-        BAIL_ON_TDNF_ERROR(dwError);
-
         break;
     }
 
